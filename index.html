@@ -758,22 +758,8 @@
     </div>
   </div>
 
-  <!-- Quantum orbital decoration -->
-  <svg class="orbital" viewBox="0 0 420 420" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <circle cx="210" cy="210" r="150" stroke="rgba(74,240,200,0.15)" stroke-width="0.5"/>
-    <circle cx="210" cy="210" r="100" stroke="rgba(123,143,247,0.15)" stroke-width="0.5"/>
-    <ellipse cx="210" cy="210" rx="200" ry="70" stroke="rgba(74,240,200,0.2)" stroke-width="0.5" transform="rotate(-30 210 210)"/>
-    <g class="orbital-inner">
-      <ellipse cx="210" cy="210" rx="160" ry="55" stroke="rgba(123,143,247,0.2)" stroke-width="0.5" transform="rotate(40 210 210)"/>
-    </g>
-    <circle class="orbital-core" cx="210" cy="210" r="10" fill="rgba(74,240,200,0.4)"/>
-    <circle cx="210" cy="210" r="4" fill="rgba(74,240,200,0.9)"/>
-    <!-- Electron dots -->
-    <circle cx="360" cy="210" r="4" fill="rgba(74,240,200,0.6)"/>
-    <circle cx="80" cy="160" r="3" fill="rgba(123,143,247,0.6)"/>
-    <circle cx="300" cy="90" r="3" fill="rgba(74,240,200,0.5)"/>
-    <circle cx="120" cy="290" r="3" fill="rgba(123,143,247,0.5)"/>
-  </svg>
+  <!-- Bloch Sphere Canvas -->
+  <canvas id="blochCanvas" class="orbital" style="width:440px;height:440px;"></canvas>
 </div>
 
 <hr class="divider">
@@ -819,6 +805,17 @@
 
 <hr class="divider">
 
+<!-- Quantum Circuit Animation Banner -->
+<div style="position:relative; z-index:1; overflow:hidden; border-top:1px solid rgba(74,240,200,0.08); border-bottom:1px solid rgba(74,240,200,0.08); background:rgba(74,240,200,0.015);">
+  <canvas id="circuitCanvas" style="width:100%; height:180px; display:block; opacity:0.85;"></canvas>
+  <div style="position:absolute; top:50%; left:4rem; transform:translateY(-50%);">
+    <p style="font-family:'DM Mono',monospace; font-size:0.7rem; color:rgba(74,240,200,0.5); letter-spacing:0.15em; text-transform:uppercase; margin-bottom:0.3rem;">Variational Quantum Circuit</p>
+    <p style="font-family:'DM Mono',monospace; font-size:0.65rem; color:rgba(110,135,160,0.6); letter-spacing:0.08em;">Parameterised gates · Gradient evaluation · NISQ optimisation</p>
+  </div>
+</div>
+
+<hr class="divider">
+
 <!-- Research -->
 <section id="research">
   <p class="section-label">Work</p>
@@ -855,6 +852,17 @@
     <a href="https://github.com/rabiacui/Entanglement-Dynamics-in-Dissipative-Environment-for-a-Bipartite-System" class="pub-link" target="_blank" style="margin-top:1.25rem; display:inline-flex;">View on GitHub ↗</a>
   </div>
 </section>
+
+<hr class="divider">
+
+<!-- QML Network Animation Banner -->
+<div style="position:relative; z-index:1; overflow:hidden; background:rgba(123,143,247,0.015); border-top:1px solid rgba(123,143,247,0.08); border-bottom:1px solid rgba(123,143,247,0.08);">
+  <canvas id="qmlCanvas" style="width:100%; height:200px; display:block; opacity:0.9;"></canvas>
+  <div style="position:absolute; top:50%; right:4rem; transform:translateY(-50%); text-align:right;">
+    <p style="font-family:'DM Mono',monospace; font-size:0.7rem; color:rgba(123,143,247,0.6); letter-spacing:0.15em; text-transform:uppercase; margin-bottom:0.3rem;">Quantum Machine Learning</p>
+    <p style="font-family:'DM Mono',monospace; font-size:0.65rem; color:rgba(110,135,160,0.6); letter-spacing:0.08em;">Hybrid quantum–classical · Feature maps · Entanglement layers</p>
+  </div>
+</div>
 
 <hr class="divider">
 
@@ -1100,10 +1108,567 @@
   </div>
 </section>
 
+<div style="position:relative; z-index:1; overflow:hidden; border-top:1px solid rgba(74,240,200,0.06);">
+  <canvas id="entangleCanvas" style="width:100%; height:140px; display:block; opacity:0.5;"></canvas>
+</div>
+
 <footer>
   <p>© 2025 Rabia Abdul Razaq</p>
   <p>PhD Candidate · University of Genova · Turin, Italy</p>
 </footer>
+
+<script>
+// ─── BLOCH SPHERE ───────────────────────────────────────────────
+(function() {
+  const canvas = document.getElementById('blochCanvas');
+  if (!canvas) return;
+  const dpr = window.devicePixelRatio || 1;
+  const SIZE = 440;
+  canvas.width = SIZE * dpr;
+  canvas.height = SIZE * dpr;
+  canvas.style.width = SIZE + 'px';
+  canvas.style.height = SIZE + 'px';
+  const ctx = canvas.getContext('2d');
+  ctx.scale(dpr, dpr);
+
+  const cx = SIZE / 2, cy = SIZE / 2, R = 160;
+  let t = 0;
+  // State vector angles
+  let theta = Math.PI / 3, phi = 0;
+  // Trail
+  const trail = [];
+
+  function project3D(x, y, z, rx, ry) {
+    // simple isometric-ish projection with rotation
+    const cosRx = Math.cos(rx), sinRx = Math.sin(rx);
+    const cosRy = Math.cos(ry), sinRy = Math.sin(ry);
+    // Rotate around Y
+    const x1 = x * cosRy + z * sinRy;
+    const z1 = -x * sinRy + z * cosRy;
+    // Rotate around X
+    const y2 = y * cosRx - z1 * sinRx;
+    const z2 = y * sinRx + z1 * cosRx;
+    return { x: x1, y: y2, z: z2 };
+  }
+
+  function drawEllipseArc(ctx, rx, ry, rotX, rotY, color, dashed) {
+    ctx.beginPath();
+    if (dashed) ctx.setLineDash([4, 6]);
+    else ctx.setLineDash([]);
+    let first = true;
+    for (let a = 0; a <= Math.PI * 2; a += 0.04) {
+      const x = Math.cos(a), y = Math.sin(a), z = 0;
+      const p = project3D(rx * x, ry * y, z, rotX, rotY);
+      const sx = cx + p.x * R, sy = cy + p.y * R;
+      if (first) { ctx.moveTo(sx, sy); first = false; }
+      else ctx.lineTo(sx, sy);
+    }
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 0.6;
+    ctx.stroke();
+    ctx.setLineDash([]);
+  }
+
+  function frame() {
+    t += 0.008;
+    theta = Math.PI / 3 + Math.sin(t * 0.7) * 0.6;
+    phi = t * 0.9;
+
+    ctx.clearRect(0, 0, SIZE, SIZE);
+
+    const rotX = -0.4, rotY = t * 0.15;
+
+    // Sphere meridians
+    for (let i = 0; i < 6; i++) {
+      const angle = (i / 6) * Math.PI;
+      drawEllipseArc(ctx, Math.cos(angle), Math.sin(angle), rotX, rotY, 'rgba(74,240,200,0.07)', false);
+    }
+    // Equator
+    drawEllipseArc(ctx, 1, 1, rotX + Math.PI / 2, rotY, 'rgba(74,240,200,0.12)', false);
+    // Tropics
+    drawEllipseArc(ctx, 0.87, 0.87, rotX + Math.PI / 2 + 0.5, rotY, 'rgba(74,240,200,0.06)', true);
+    drawEllipseArc(ctx, 0.87, 0.87, rotX + Math.PI / 2 - 0.5, rotY, 'rgba(74,240,200,0.06)', true);
+
+    // Axes
+    const axes = [
+      { v: [1,0,0], label: '|+⟩', color: 'rgba(74,240,200,0.3)' },
+      { v: [-1,0,0], label: '|−⟩', color: 'rgba(74,240,200,0.15)' },
+      { v: [0,1,0], label: '|i⟩', color: 'rgba(123,143,247,0.3)' },
+      { v: [0,-1,0], label: '|−i⟩', color: 'rgba(123,143,247,0.15)' },
+      { v: [0,0,1], label: '|0⟩', color: 'rgba(255,255,255,0.4)' },
+      { v: [0,0,-1], label: '|1⟩', color: 'rgba(255,255,255,0.2)' },
+    ];
+    axes.forEach(ax => {
+      const p0 = project3D(0, 0, 0, rotX, rotY);
+      const p1 = project3D(ax.v[0], ax.v[1], ax.v[2], rotX, rotY);
+      ctx.beginPath();
+      ctx.moveTo(cx + p0.x * R, cy + p0.y * R);
+      ctx.lineTo(cx + p1.x * R * 1.15, cy + p1.y * R * 1.15);
+      ctx.strokeStyle = ax.color;
+      ctx.lineWidth = 0.7;
+      ctx.setLineDash([3,4]);
+      ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.fillStyle = ax.color;
+      ctx.font = '11px DM Mono, monospace';
+      ctx.fillText(ax.label, cx + p1.x * R * 1.28 - 8, cy + p1.y * R * 1.28 + 4);
+    });
+
+    // State vector
+    const sx3 = Math.sin(theta) * Math.cos(phi);
+    const sy3 = Math.sin(theta) * Math.sin(phi);
+    const sz3 = Math.cos(theta);
+    const sp = project3D(sx3, sy3, sz3, rotX, rotY);
+    const ex = cx + sp.x * R, ey = cy + sp.y * R;
+
+    // Trail
+    trail.push({ x: ex, y: ey, t: t });
+    if (trail.length > 80) trail.shift();
+
+    // Draw trail
+    for (let i = 1; i < trail.length; i++) {
+      const alpha = (i / trail.length) * 0.5;
+      ctx.beginPath();
+      ctx.moveTo(trail[i-1].x, trail[i-1].y);
+      ctx.lineTo(trail[i].x, trail[i].y);
+      ctx.strokeStyle = `rgba(74,240,200,${alpha})`;
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+    }
+
+    // State vector arrow
+    ctx.beginPath();
+    ctx.moveTo(cx, cy);
+    ctx.lineTo(ex, ey);
+    ctx.strokeStyle = '#4af0c8';
+    ctx.lineWidth = 1.8;
+    ctx.setLineDash([]);
+    ctx.stroke();
+
+    // Arrowhead
+    const ang = Math.atan2(ey - cy, ex - cx);
+    ctx.beginPath();
+    ctx.moveTo(ex, ey);
+    ctx.lineTo(ex - 10 * Math.cos(ang - 0.4), ey - 10 * Math.sin(ang - 0.4));
+    ctx.lineTo(ex - 10 * Math.cos(ang + 0.4), ey - 10 * Math.sin(ang + 0.4));
+    ctx.closePath();
+    ctx.fillStyle = '#4af0c8';
+    ctx.fill();
+
+    // State dot
+    ctx.beginPath();
+    ctx.arc(ex, ey, 5, 0, Math.PI * 2);
+    ctx.fillStyle = '#4af0c8';
+    ctx.shadowColor = '#4af0c8';
+    ctx.shadowBlur = 10;
+    ctx.fill();
+    ctx.shadowBlur = 0;
+
+    // Center dot
+    ctx.beginPath();
+    ctx.arc(cx, cy, 3, 0, Math.PI * 2);
+    ctx.fillStyle = 'rgba(74,240,200,0.4)';
+    ctx.fill();
+
+    // Label
+    ctx.fillStyle = 'rgba(74,240,200,0.6)';
+    ctx.font = '10px DM Mono, monospace';
+    ctx.fillText('Bloch Sphere  |ψ⟩', cx - 55, SIZE - 16);
+
+    requestAnimationFrame(frame);
+  }
+  frame();
+})();
+
+// ─── QUANTUM CIRCUIT ────────────────────────────────────────────
+(function() {
+  const canvas = document.getElementById('circuitCanvas');
+  if (!canvas) return;
+  const dpr = window.devicePixelRatio || 1;
+  const W = canvas.offsetWidth || window.innerWidth;
+  const H = 180;
+  canvas.width = W * dpr;
+  canvas.height = H * dpr;
+  canvas.style.height = H + 'px';
+  const ctx = canvas.getContext('2d');
+  ctx.scale(dpr, dpr);
+
+  const QUBITS = 5;
+  const GATE_TYPES = ['H', 'X', 'Y', 'Z', 'Rₓ', 'Rᵧ', 'T', 'S', 'CX'];
+  const qColors = ['#4af0c8', '#7b8ff7', '#4af0c8', '#f0c874', '#4af0c8'];
+  const startX = 280, endX = W - 20;
+  const gapY = 28;
+  const topY = (H - (QUBITS - 1) * gapY) / 2;
+
+  // Gate columns
+  const cols = [];
+  const numCols = Math.floor((endX - startX) / 55);
+  for (let c = 0; c < numCols; c++) {
+    const col = { x: startX + c * 55 + 28, gates: [], cx: null };
+    // Random gate assignment per qubit
+    const usedQ = new Set();
+    if (Math.random() < 0.25 && c > 0) {
+      // CNOT
+      const q1 = Math.floor(Math.random() * (QUBITS - 1));
+      const q2 = q1 + 1;
+      col.cx = { control: q1, target: q2 };
+      usedQ.add(q1); usedQ.add(q2);
+    }
+    for (let q = 0; q < QUBITS; q++) {
+      if (!usedQ.has(q) && Math.random() < 0.65) {
+        const gtype = GATE_TYPES[Math.floor(Math.random() * (GATE_TYPES.length - 1))];
+        col.gates.push({ q, type: gtype, phase: Math.random() * Math.PI * 2 });
+      }
+    }
+    cols.push(col);
+  }
+
+  let t = 0;
+  // Signal pulses
+  const pulses = [];
+  for (let q = 0; q < QUBITS; q++) {
+    pulses.push({ q, x: startX + Math.random() * (endX - startX), speed: 1.5 + Math.random() * 1.5 });
+  }
+
+  function frame() {
+    t += 0.016;
+    ctx.clearRect(0, 0, W, H);
+
+    // Wire lines
+    for (let q = 0; q < QUBITS; q++) {
+      const y = topY + q * gapY;
+      ctx.beginPath();
+      ctx.moveTo(20, y);
+      ctx.lineTo(W - 20, y);
+      ctx.strokeStyle = `rgba(74,240,200,0.12)`;
+      ctx.lineWidth = 0.8;
+      ctx.stroke();
+
+      // Qubit label
+      ctx.fillStyle = qColors[q];
+      ctx.font = '10px DM Mono, monospace';
+      ctx.fillText(`q${q}`, 20, y + 4);
+      ctx.fillText(`|0⟩`, 50, y + 4);
+    }
+
+    // Measurement symbol at end
+    for (let q = 0; q < QUBITS; q++) {
+      const y = topY + q * gapY;
+      ctx.beginPath();
+      ctx.arc(W - 30, y, 8, 0, Math.PI * 2);
+      ctx.strokeStyle = `rgba(74,240,200,0.25)`;
+      ctx.lineWidth = 0.8;
+      ctx.stroke();
+      // meter arc
+      ctx.beginPath();
+      ctx.arc(W - 30, y + 2, 5, Math.PI, 0);
+      ctx.strokeStyle = `rgba(74,240,200,0.4)`;
+      ctx.lineWidth = 0.7;
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(W - 30, y + 2);
+      ctx.lineTo(W - 30 + 3, y - 4);
+      ctx.strokeStyle = `rgba(74,240,200,0.5)`;
+      ctx.lineWidth = 0.8;
+      ctx.stroke();
+    }
+
+    // Draw CNOT connections
+    cols.forEach(col => {
+      if (col.cx) {
+        const yc = topY + col.cx.control * gapY;
+        const yt = topY + col.cx.target * gapY;
+        ctx.beginPath();
+        ctx.moveTo(col.x, yc);
+        ctx.lineTo(col.x, yt);
+        ctx.strokeStyle = 'rgba(123,143,247,0.35)';
+        ctx.lineWidth = 0.8;
+        ctx.stroke();
+        // control dot
+        ctx.beginPath();
+        ctx.arc(col.x, yc, 4, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(123,143,247,0.6)';
+        ctx.fill();
+        // target circle
+        ctx.beginPath();
+        ctx.arc(col.x, yt, 7, 0, Math.PI * 2);
+        ctx.strokeStyle = 'rgba(123,143,247,0.5)';
+        ctx.lineWidth = 0.8;
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(col.x - 7, yt); ctx.lineTo(col.x + 7, yt);
+        ctx.moveTo(col.x, yt - 7); ctx.lineTo(col.x, yt + 7);
+        ctx.strokeStyle = 'rgba(123,143,247,0.5)';
+        ctx.stroke();
+      }
+    });
+
+    // Draw gates
+    cols.forEach((col, ci) => {
+      col.gates.forEach(g => {
+        const y = topY + g.q * gapY;
+        const pulse = Math.sin(t * 2 + g.phase) * 0.5 + 0.5;
+        const alpha = 0.5 + pulse * 0.4;
+        const isParam = ['Rₓ','Rᵧ'].includes(g.type);
+        const color = isParam ? `rgba(240,200,74,${alpha})` : `rgba(74,240,200,${alpha})`;
+        ctx.beginPath();
+        ctx.rect(col.x - 10, y - 9, 20, 18);
+        ctx.fillStyle = isParam ? `rgba(240,200,74,0.08)` : `rgba(74,240,200,0.06)`;
+        ctx.fill();
+        ctx.strokeStyle = color;
+        ctx.lineWidth = 0.8;
+        ctx.stroke();
+        ctx.fillStyle = color;
+        ctx.font = `bold 8px DM Mono, monospace`;
+        ctx.textAlign = 'center';
+        ctx.fillText(g.type, col.x, y + 3);
+        ctx.textAlign = 'left';
+      });
+    });
+
+    // Animated signal pulses
+    pulses.forEach(p => {
+      p.x += p.speed;
+      if (p.x > endX) p.x = startX;
+      const y = topY + p.q * gapY;
+      const grad = ctx.createRadialGradient(p.x, y, 0, p.x, y, 12);
+      grad.addColorStop(0, `rgba(74,240,200,0.8)`);
+      grad.addColorStop(1, `rgba(74,240,200,0)`);
+      ctx.beginPath();
+      ctx.arc(p.x, y, 4, 0, Math.PI * 2);
+      ctx.fillStyle = grad;
+      ctx.fill();
+      ctx.beginPath();
+      ctx.arc(p.x, y, 2, 0, Math.PI * 2);
+      ctx.fillStyle = '#4af0c8';
+      ctx.fill();
+    });
+
+    requestAnimationFrame(frame);
+  }
+  frame();
+})();
+
+// ─── QML HYBRID NETWORK ─────────────────────────────────────────
+(function() {
+  const canvas = document.getElementById('qmlCanvas');
+  if (!canvas) return;
+  const dpr = window.devicePixelRatio || 1;
+  const W = canvas.offsetWidth || window.innerWidth;
+  const H = 200;
+  canvas.width = W * dpr;
+  canvas.height = H * dpr;
+  canvas.style.height = H + 'px';
+  const ctx = canvas.getContext('2d');
+  ctx.scale(dpr, dpr);
+
+  // Layers: Classical Input → Encoding → Quantum Layer → Quantum Layer → Measurement → Classical Output
+  const layers = [
+    { label: 'Classical\nInput', nodes: 3, color: '#6e87a0', x: 0.08 },
+    { label: 'Encoding\nLayer', nodes: 4, color: '#4af0c8', x: 0.22, quantum: true },
+    { label: 'Variational\nLayer 1', nodes: 4, color: '#7b8ff7', x: 0.38, quantum: true },
+    { label: 'Variational\nLayer 2', nodes: 4, color: '#7b8ff7', x: 0.52, quantum: true },
+    { label: 'QNDM\nMeasure', nodes: 4, color: '#f0c874', x: 0.66, quantum: true },
+    { label: 'Classical\nOutput', nodes: 2, color: '#6e87a0', x: 0.80 },
+  ];
+
+  let t = 0;
+  // Activation signals flowing through
+  const signals = [];
+  for (let i = 0; i < 18; i++) {
+    signals.push({
+      fromLayer: Math.floor(Math.random() * (layers.length - 1)),
+      fromNode: Math.floor(Math.random() * 4),
+      toNode: Math.floor(Math.random() * 4),
+      progress: Math.random(),
+      speed: 0.003 + Math.random() * 0.004,
+      alpha: 0.3 + Math.random() * 0.5
+    });
+  }
+
+  function getNodePos(layerIdx, nodeIdx) {
+    const layer = layers[layerIdx];
+    const n = layer.nodes;
+    const x = layer.x * W;
+    const spacing = Math.min(28, (H - 40) / (n + 1));
+    const totalH = (n - 1) * spacing;
+    const y = H / 2 - totalH / 2 + nodeIdx * spacing;
+    return { x, y };
+  }
+
+  function frame() {
+    t += 0.012;
+    ctx.clearRect(0, 0, W, H);
+
+    // Draw edges (static, faint)
+    for (let l = 0; l < layers.length - 1; l++) {
+      const nl = layers[l].nodes, nr = layers[l + 1].nodes;
+      for (let i = 0; i < nl; i++) {
+        for (let j = 0; j < nr; j++) {
+          const p0 = getNodePos(l, i), p1 = getNodePos(l + 1, j);
+          ctx.beginPath();
+          ctx.moveTo(p0.x, p0.y);
+          ctx.lineTo(p1.x, p1.y);
+          ctx.strokeStyle = 'rgba(74,240,200,0.04)';
+          ctx.lineWidth = 0.5;
+          ctx.stroke();
+        }
+      }
+    }
+
+    // Animate signals along edges
+    signals.forEach(sig => {
+      sig.progress += sig.speed;
+      if (sig.progress >= 1) {
+        sig.progress = 0;
+        sig.fromLayer = (sig.fromLayer + 1) % (layers.length - 1);
+        sig.fromNode = Math.floor(Math.random() * layers[sig.fromLayer].nodes);
+        sig.toNode = Math.floor(Math.random() * layers[sig.fromLayer + 1].nodes);
+      }
+      const p0 = getNodePos(sig.fromLayer, sig.fromNode);
+      const p1 = getNodePos(sig.fromLayer + 1, sig.toNode);
+      const px = p0.x + (p1.x - p0.x) * sig.progress;
+      const py = p0.y + (p1.y - p0.y) * sig.progress;
+      const color = layers[sig.fromLayer].quantum ? '#7b8ff7' : '#4af0c8';
+      ctx.beginPath();
+      ctx.arc(px, py, 2.5, 0, Math.PI * 2);
+      ctx.fillStyle = color.replace(')', `,${sig.alpha})`).replace('rgb', 'rgba').replace('#7b8ff7', `rgba(123,143,247,${sig.alpha})`).replace('#4af0c8', `rgba(74,240,200,${sig.alpha})`);
+      ctx.fill();
+    });
+
+    // Draw nodes
+    layers.forEach((layer, li) => {
+      for (let ni = 0; ni < layer.nodes; ni++) {
+        const p = getNodePos(li, ni);
+        const pulse = Math.sin(t * 2 + li * 1.2 + ni * 0.8) * 0.5 + 0.5;
+        // Outer glow ring for quantum layers
+        if (layer.quantum) {
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, 9 + pulse * 3, 0, Math.PI * 2);
+          ctx.strokeStyle = layer.color.replace('#', 'rgba(').replace('4af0c8', '74,240,200,0.15)').replace('7b8ff7', '123,143,247,0.15)').replace('f0c874', '240,200,116,0.15)');
+          // simpler:
+          ctx.strokeStyle = `${layer.color}22`;
+          ctx.lineWidth = 1;
+          ctx.stroke();
+        }
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, 6, 0, Math.PI * 2);
+        ctx.fillStyle = layer.quantum ? layer.color + '33' : 'rgba(110,135,160,0.2)';
+        ctx.fill();
+        ctx.strokeStyle = layer.color;
+        ctx.lineWidth = layer.quantum ? 1 + pulse * 0.5 : 0.8;
+        ctx.stroke();
+      }
+
+      // Layer label
+      const lx = layer.x * W;
+      ctx.fillStyle = layer.quantum ? layer.color + 'aa' : 'rgba(110,135,160,0.5)';
+      ctx.font = '8px DM Mono, monospace';
+      ctx.textAlign = 'center';
+      const lines = layer.label.split('\n');
+      lines.forEach((line, i) => ctx.fillText(line, lx, H - 18 + i * 10));
+      ctx.textAlign = 'left';
+    });
+
+    // Quantum/classical boundary line
+    const qStartX = layers[1].x * W - 20;
+    const qEndX = layers[4].x * W + 20;
+    ctx.beginPath();
+    ctx.rect(qStartX, 8, qEndX - qStartX, H - 30);
+    ctx.strokeStyle = 'rgba(123,143,247,0.08)';
+    ctx.lineWidth = 0.5;
+    ctx.setLineDash([4, 6]);
+    ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle = 'rgba(123,143,247,0.05)';
+    ctx.fill();
+    ctx.fillStyle = 'rgba(123,143,247,0.3)';
+    ctx.font = '8px DM Mono, monospace';
+    ctx.fillText('QUANTUM PROCESSOR', qStartX + 6, 18);
+
+    requestAnimationFrame(frame);
+  }
+  frame();
+})();
+
+// ─── ENTANGLEMENT PARTICLE FIELD ────────────────────────────────
+(function() {
+  const canvas = document.getElementById('entangleCanvas');
+  if (!canvas) return;
+  const dpr = window.devicePixelRatio || 1;
+  const W = canvas.offsetWidth || window.innerWidth;
+  const H = 140;
+  canvas.width = W * dpr;
+  canvas.height = H * dpr;
+  canvas.style.height = H + 'px';
+  const ctx = canvas.getContext('2d');
+  ctx.scale(dpr, dpr);
+
+  const N = 40;
+  const particles = [];
+  for (let i = 0; i < N; i++) {
+    particles.push({
+      x: Math.random() * W,
+      y: Math.random() * H,
+      vx: (Math.random() - 0.5) * 0.4,
+      vy: (Math.random() - 0.5) * 0.3,
+      r: 1.5 + Math.random() * 2,
+      phase: Math.random() * Math.PI * 2,
+      entangled: Math.floor(Math.random() * N), // entangled partner index
+      color: Math.random() > 0.5 ? '#4af0c8' : '#7b8ff7'
+    });
+  }
+
+  let t = 0;
+
+  function frame() {
+    t += 0.01;
+    ctx.clearRect(0, 0, W, H);
+
+    // Update positions
+    particles.forEach(p => {
+      p.x += p.vx;
+      p.y += p.vy;
+      if (p.x < 0) p.x = W;
+      if (p.x > W) p.x = 0;
+      if (p.y < 0) p.y = H;
+      if (p.y > H) p.y = 0;
+    });
+
+    // Draw entanglement connections
+    for (let i = 0; i < N; i++) {
+      const p = particles[i];
+      const q = particles[p.entangled];
+      const dist = Math.hypot(p.x - q.x, p.y - q.y);
+      if (dist < 200) {
+        const alpha = (1 - dist / 200) * 0.2 * (Math.sin(t * 3 + p.phase) * 0.5 + 0.5);
+        ctx.beginPath();
+        ctx.moveTo(p.x, p.y);
+        ctx.lineTo(q.x, q.y);
+        ctx.strokeStyle = `rgba(74,240,200,${alpha})`;
+        ctx.lineWidth = 0.5;
+        ctx.stroke();
+      }
+    }
+
+    // Draw particles
+    particles.forEach(p => {
+      const pulse = Math.sin(t * 3 + p.phase) * 0.5 + 0.5;
+      const r = p.r + pulse * 1.5;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, r, 0, Math.PI * 2);
+      const alpha = 0.4 + pulse * 0.4;
+      ctx.fillStyle = p.color === '#4af0c8'
+        ? `rgba(74,240,200,${alpha})`
+        : `rgba(123,143,247,${alpha})`;
+      ctx.fill();
+    });
+
+    requestAnimationFrame(frame);
+  }
+  frame();
+})();
+</script>
 
 </body>
 </html>
