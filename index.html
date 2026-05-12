@@ -1,0 +1,1038 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rabia Abdul Razaq — Quantum Computing Researcher</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@300;400;500&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #050a12;
+    --bg2: #0b1422;
+    --bg3: #111d2e;
+    --accent: #4af0c8;
+    --accent2: #7b8ff7;
+    --accent3: #f07b7b;
+    --text: #e8eef5;
+    --muted: #6e87a0;
+    --border: rgba(74, 240, 200, 0.12);
+    --card: rgba(255,255,255,0.03);
+    --glow: rgba(74, 240, 200, 0.08);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Outfit', sans-serif;
+    font-weight: 300;
+    line-height: 1.7;
+    overflow-x: hidden;
+  }
+
+  /* Grid background */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(74,240,200,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(74,240,200,0.03) 1px, transparent 1px);
+    background-size: 48px 48px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* Nav */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.2rem 4rem;
+    background: rgba(5, 10, 18, 0.85);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .nav-logo {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.85rem;
+    color: var(--accent);
+    letter-spacing: 0.1em;
+  }
+
+  .nav-links {
+    display: flex;
+    gap: 2.5rem;
+    list-style: none;
+  }
+
+  .nav-links a {
+    font-size: 0.82rem;
+    text-decoration: none;
+    color: var(--muted);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    transition: color 0.25s;
+  }
+
+  .nav-links a:hover { color: var(--accent); }
+
+  /* Hero */
+  .hero {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    padding: 0 4rem;
+    position: relative;
+    z-index: 1;
+  }
+
+  .hero-inner {
+    max-width: 900px;
+  }
+
+  .hero-tag {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.78rem;
+    color: var(--accent);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .hero-tag::before {
+    content: '';
+    width: 32px;
+    height: 1px;
+    background: var(--accent);
+    display: inline-block;
+  }
+
+  .hero h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(3rem, 6vw, 5.5rem);
+    line-height: 1.1;
+    margin-bottom: 0.5rem;
+    letter-spacing: -0.01em;
+  }
+
+  .hero h1 em {
+    font-style: italic;
+    color: var(--accent);
+  }
+
+  .hero-subtitle {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.9rem;
+    color: var(--muted);
+    margin-bottom: 2rem;
+    letter-spacing: 0.05em;
+  }
+
+  .hero-desc {
+    font-size: 1.1rem;
+    color: #a0b5c8;
+    max-width: 600px;
+    margin-bottom: 3rem;
+    line-height: 1.8;
+  }
+
+  .hero-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    margin-bottom: 3rem;
+  }
+
+  .chip {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.72rem;
+    padding: 0.35rem 0.9rem;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    color: var(--accent);
+    letter-spacing: 0.05em;
+    background: var(--glow);
+    transition: all 0.2s;
+  }
+
+  .chip:hover {
+    border-color: var(--accent);
+    background: rgba(74,240,200,0.15);
+  }
+
+  .hero-cta {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.75rem;
+    font-family: 'Outfit', sans-serif;
+    font-size: 0.88rem;
+    font-weight: 500;
+    text-decoration: none;
+    letter-spacing: 0.03em;
+    transition: all 0.25s;
+    border-radius: 4px;
+  }
+
+  .btn-primary {
+    background: var(--accent);
+    color: #050a12;
+    border: 1px solid var(--accent);
+  }
+
+  .btn-primary:hover {
+    background: transparent;
+    color: var(--accent);
+  }
+
+  .btn-ghost {
+    border: 1px solid var(--border);
+    color: var(--muted);
+    background: transparent;
+  }
+
+  .btn-ghost:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  /* Orbital decoration */
+  .orbital {
+    position: absolute;
+    right: 5%;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 420px;
+    height: 420px;
+    opacity: 0.35;
+  }
+
+  /* Sections */
+  section {
+    position: relative;
+    z-index: 1;
+    padding: 6rem 4rem;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  .section-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--accent);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .section-label::before {
+    content: '';
+    width: 24px;
+    height: 1px;
+    background: var(--accent);
+  }
+
+  .section-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 2.5rem;
+    margin-bottom: 3rem;
+    line-height: 1.2;
+  }
+
+  /* About grid */
+  .about-grid {
+    display: grid;
+    grid-template-columns: 1.3fr 1fr;
+    gap: 4rem;
+    align-items: start;
+  }
+
+  .about-text p {
+    color: #a0b5c8;
+    margin-bottom: 1.25rem;
+    font-size: 1rem;
+  }
+
+  .about-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+  }
+
+  .stat-box {
+    background: var(--bg);
+    padding: 1.75rem;
+    text-align: center;
+  }
+
+  .stat-number {
+    font-family: 'DM Serif Display', serif;
+    font-size: 2.8rem;
+    color: var(--accent);
+    line-height: 1;
+    margin-bottom: 0.4rem;
+  }
+
+  .stat-label {
+    font-size: 0.78rem;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-family: 'DM Mono', monospace;
+  }
+
+  /* Research */
+  .research-card {
+    border: 1px solid var(--border);
+    background: var(--card);
+    padding: 2.5rem;
+    margin-bottom: 1.5rem;
+    position: relative;
+    transition: border-color 0.25s;
+  }
+
+  .research-card::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 3px;
+    background: var(--accent);
+    transform: scaleY(0);
+    transform-origin: bottom;
+    transition: transform 0.3s ease;
+  }
+
+  .research-card:hover {
+    border-color: rgba(74, 240, 200, 0.3);
+  }
+
+  .research-card:hover::before {
+    transform: scaleY(1);
+  }
+
+  .research-card h3 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.3rem;
+    margin-bottom: 0.75rem;
+    color: var(--text);
+  }
+
+  .research-card p {
+    color: #7a9ab5;
+    font-size: 0.95rem;
+    margin-bottom: 1.25rem;
+    line-height: 1.75;
+  }
+
+  .research-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .tag {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.68rem;
+    padding: 0.25rem 0.7rem;
+    background: rgba(123,143,247,0.12);
+    color: var(--accent2);
+    border: 1px solid rgba(123,143,247,0.2);
+    border-radius: 2px;
+    letter-spacing: 0.04em;
+  }
+
+  .tag.green {
+    background: rgba(74,240,200,0.08);
+    color: var(--accent);
+    border-color: rgba(74,240,200,0.2);
+  }
+
+  /* Publication highlight */
+  .pub-card {
+    border: 1px solid rgba(74,240,200,0.25);
+    background: rgba(74,240,200,0.04);
+    padding: 2.5rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .pub-card::after {
+    content: '"';
+    position: absolute;
+    right: 1.5rem;
+    top: -0.5rem;
+    font-family: 'DM Serif Display', serif;
+    font-size: 8rem;
+    color: rgba(74,240,200,0.06);
+    line-height: 1;
+  }
+
+  .pub-venue {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.72rem;
+    color: var(--accent);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+  }
+
+  .pub-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.4rem;
+    margin-bottom: 0.75rem;
+    line-height: 1.35;
+  }
+
+  .pub-meta {
+    color: var(--muted);
+    font-size: 0.85rem;
+    font-family: 'DM Mono', monospace;
+  }
+
+  .pub-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    margin-top: 1.25rem;
+    color: var(--accent);
+    font-family: 'DM Mono', monospace;
+    font-size: 0.78rem;
+    text-decoration: none;
+    letter-spacing: 0.05em;
+    border-bottom: 1px solid rgba(74,240,200,0.3);
+    padding-bottom: 2px;
+    transition: border-color 0.2s;
+  }
+
+  .pub-link:hover { border-color: var(--accent); }
+
+  /* Timeline (Education & Experience) */
+  .timeline {
+    position: relative;
+    padding-left: 2rem;
+  }
+
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 8px;
+    bottom: 8px;
+    width: 1px;
+    background: linear-gradient(to bottom, var(--accent), transparent);
+  }
+
+  .timeline-item {
+    position: relative;
+    margin-bottom: 3rem;
+    padding-left: 1.5rem;
+  }
+
+  .timeline-item::before {
+    content: '';
+    position: absolute;
+    left: -2.45rem;
+    top: 8px;
+    width: 8px;
+    height: 8px;
+    border: 1px solid var(--accent);
+    background: var(--bg);
+    transform: rotate(45deg);
+  }
+
+  .timeline-date {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.72rem;
+    color: var(--accent);
+    letter-spacing: 0.1em;
+    margin-bottom: 0.4rem;
+  }
+
+  .timeline-role {
+    font-size: 1.05rem;
+    font-weight: 500;
+    margin-bottom: 0.2rem;
+  }
+
+  .timeline-place {
+    font-size: 0.88rem;
+    color: var(--muted);
+    margin-bottom: 0.75rem;
+    font-family: 'DM Mono', monospace;
+  }
+
+  .timeline-desc {
+    color: #7a9ab5;
+    font-size: 0.92rem;
+    line-height: 1.7;
+  }
+
+  /* Skills */
+  .skills-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 1.5rem;
+  }
+
+  .skill-group {
+    border: 1px solid var(--border);
+    padding: 1.75rem;
+    background: var(--card);
+  }
+
+  .skill-group-title {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.72rem;
+    color: var(--accent);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-bottom: 1.25rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .skill-item {
+    font-size: 0.9rem;
+    color: #8eaac0;
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+
+  .skill-item::before {
+    content: '▸';
+    color: var(--accent);
+    font-size: 0.7rem;
+  }
+
+  /* Events */
+  .events-list {
+    display: grid;
+    gap: 1rem;
+  }
+
+  .event-item {
+    display: grid;
+    grid-template-columns: 5rem 1fr;
+    gap: 1.5rem;
+    padding: 1.25rem 0;
+    border-bottom: 1px solid var(--border);
+    align-items: start;
+  }
+
+  .event-year {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--accent);
+    letter-spacing: 0.08em;
+    padding-top: 3px;
+  }
+
+  .event-name {
+    font-size: 0.95rem;
+    font-weight: 400;
+    margin-bottom: 0.2rem;
+  }
+
+  .event-location {
+    font-size: 0.82rem;
+    color: var(--muted);
+    font-family: 'DM Mono', monospace;
+  }
+
+  /* Contact */
+  .contact-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4rem;
+    align-items: center;
+  }
+
+  .contact-text h2 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 2.8rem;
+    line-height: 1.15;
+    margin-bottom: 1.25rem;
+  }
+
+  .contact-text h2 em {
+    font-style: italic;
+    color: var(--accent);
+  }
+
+  .contact-text p {
+    color: #7a9ab5;
+    font-size: 1rem;
+    margin-bottom: 2rem;
+  }
+
+  .contact-links {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .contact-link {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    text-decoration: none;
+    color: var(--text);
+    padding: 1.1rem 1.5rem;
+    border: 1px solid var(--border);
+    background: var(--card);
+    transition: all 0.25s;
+  }
+
+  .contact-link:hover {
+    border-color: var(--accent);
+    background: var(--glow);
+    color: var(--accent);
+  }
+
+  .contact-link-icon {
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--border);
+    color: var(--accent);
+    font-size: 1rem;
+    flex-shrink: 0;
+  }
+
+  .contact-link-label {
+    font-size: 0.78rem;
+    color: var(--muted);
+    font-family: 'DM Mono', monospace;
+    display: block;
+    margin-bottom: 0.1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+
+  .contact-link-value {
+    font-size: 0.92rem;
+  }
+
+  /* Footer */
+  footer {
+    position: relative;
+    z-index: 1;
+    border-top: 1px solid var(--border);
+    padding: 2rem 4rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  footer p {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.72rem;
+    color: var(--muted);
+    letter-spacing: 0.05em;
+  }
+
+  /* Divider */
+  .divider {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 0;
+  }
+
+  /* Animations */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes rotate {
+    from { transform: translateY(-50%) rotate(0deg); }
+    to { transform: translateY(-50%) rotate(360deg); }
+  }
+
+  @keyframes rotateReverse {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(-360deg); }
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 0.3; }
+    50% { opacity: 0.7; }
+  }
+
+  .hero-inner > * {
+    animation: fadeUp 0.8s ease both;
+  }
+
+  .hero-inner > *:nth-child(1) { animation-delay: 0.1s; }
+  .hero-inner > *:nth-child(2) { animation-delay: 0.2s; }
+  .hero-inner > *:nth-child(3) { animation-delay: 0.3s; }
+  .hero-inner > *:nth-child(4) { animation-delay: 0.4s; }
+  .hero-inner > *:nth-child(5) { animation-delay: 0.5s; }
+  .hero-inner > *:nth-child(6) { animation-delay: 0.6s; }
+
+  .orbital {
+    animation: rotate 40s linear infinite;
+  }
+
+  .orbital-inner {
+    animation: rotateReverse 25s linear infinite;
+  }
+
+  .orbital-core {
+    animation: pulse 3s ease-in-out infinite;
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    nav { padding: 1rem 1.5rem; }
+    .nav-links { display: none; }
+    .hero { padding: 0 1.5rem; }
+    .orbital { display: none; }
+    section { padding: 4rem 1.5rem; }
+    .about-grid { grid-template-columns: 1fr; gap: 2.5rem; }
+    .contact-grid { grid-template-columns: 1fr; gap: 2.5rem; }
+    footer { padding: 1.5rem; flex-direction: column; gap: 0.5rem; text-align: center; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-logo">rabia.aqr</div>
+  <ul class="nav-links">
+    <li><a href="#about">About</a></li>
+    <li><a href="#research">Research</a></li>
+    <li><a href="#publications">Publications</a></li>
+    <li><a href="#education">Education</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+</nav>
+
+<!-- Hero -->
+<div class="hero">
+  <div class="hero-inner">
+    <p class="hero-tag">PhD Candidate · University of Genova · Italy</p>
+    <h1>Rabia<br>Abdul <em>Razaq</em></h1>
+    <p class="hero-subtitle">Quantum Computing Researcher</p>
+    <p class="hero-desc">
+      Building resource-efficient quantum algorithms at the frontier of near-term quantum devices. My work focuses on quantum non-demolition measurements and variational quantum algorithms for molecular simulation.
+    </p>
+    <div class="hero-chips">
+      <span class="chip">Variational Quantum Algorithms</span>
+      <span class="chip">Quantum Non-Demolition Measurements</span>
+      <span class="chip">Quantum Machine Learning</span>
+      <span class="chip">NISQ Devices</span>
+      <span class="chip">Quantum Chemistry</span>
+    </div>
+    <div class="hero-cta">
+      <a href="#publications" class="btn btn-primary">View Publications</a>
+      <a href="#contact" class="btn btn-ghost">Get in Touch</a>
+      <a href="https://github.com/rabiacui" class="btn btn-ghost" target="_blank">GitHub ↗</a>
+    </div>
+  </div>
+
+  <!-- Quantum orbital decoration -->
+  <svg class="orbital" viewBox="0 0 420 420" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="210" cy="210" r="150" stroke="rgba(74,240,200,0.15)" stroke-width="0.5"/>
+    <circle cx="210" cy="210" r="100" stroke="rgba(123,143,247,0.15)" stroke-width="0.5"/>
+    <ellipse cx="210" cy="210" rx="200" ry="70" stroke="rgba(74,240,200,0.2)" stroke-width="0.5" transform="rotate(-30 210 210)"/>
+    <g class="orbital-inner">
+      <ellipse cx="210" cy="210" rx="160" ry="55" stroke="rgba(123,143,247,0.2)" stroke-width="0.5" transform="rotate(40 210 210)"/>
+    </g>
+    <circle class="orbital-core" cx="210" cy="210" r="10" fill="rgba(74,240,200,0.4)"/>
+    <circle cx="210" cy="210" r="4" fill="rgba(74,240,200,0.9)"/>
+    <!-- Electron dots -->
+    <circle cx="360" cy="210" r="4" fill="rgba(74,240,200,0.6)"/>
+    <circle cx="80" cy="160" r="3" fill="rgba(123,143,247,0.6)"/>
+    <circle cx="300" cy="90" r="3" fill="rgba(74,240,200,0.5)"/>
+    <circle cx="120" cy="290" r="3" fill="rgba(123,143,247,0.5)"/>
+  </svg>
+</div>
+
+<hr class="divider">
+
+<!-- About -->
+<section id="about">
+  <p class="section-label">Background</p>
+  <h2 class="section-title">About</h2>
+  <div class="about-grid">
+    <div class="about-text">
+      <p>
+        I am a PhD candidate in Physics at the University of Genova, supervised by Prof. Paolo Solinas, with collaborative appointments at the Istituto Nazionale di Fisica Nucleare (INFN). My doctoral thesis investigates quantum non-demolition measurement techniques for gradient evaluation and resource reduction in variational quantum algorithms.
+      </p>
+      <p>
+        My research demonstrates that QNDM-based approaches can significantly reduce measurement shots, circuit executions, and logical gate operations compared to conventional direct measurement techniques — making quantum algorithms more viable on today's NISQ devices.
+      </p>
+      <p>
+        I have applied these methods to molecular quantum systems including H₂, LiH, and Li₂, using INFN's high-performance computing infrastructure for large-scale hybrid quantum–classical simulations.
+      </p>
+    </div>
+    <div>
+      <div class="about-stats">
+        <div class="stat-box">
+          <div class="stat-number">1</div>
+          <div class="stat-label">Journal Publication</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-number">3+</div>
+          <div class="stat-label">Molecular Systems</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-number">5+</div>
+          <div class="stat-label">Conferences</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-number">3</div>
+          <div class="stat-label">Years Research</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- Research -->
+<section id="research">
+  <p class="section-label">Work</p>
+  <h2 class="section-title">Research Projects</h2>
+
+  <div class="research-card">
+    <h3>Quantum Non-Demolition Measurement Techniques for VQAs</h3>
+    <p>
+      Developed QNDM-based strategies for efficient gradient estimation in variational quantum algorithms. Compared direct measurement (DM) and QNDM protocols for first- and second-order derivative estimation. Demonstrated reduced measurement overhead, logical gate complexity, and circuit execution requirements across molecular Hamiltonians including H₂, LiH, and Li₂.
+    </p>
+    <div class="research-tags">
+      <span class="tag green">PhD Research · 2023–2026</span>
+      <span class="tag">INFN Collaboration</span>
+      <span class="tag">Qiskit</span>
+      <span class="tag">PennyLane</span>
+      <span class="tag">Python</span>
+      <span class="tag">HPC</span>
+    </div>
+  </div>
+
+  <div class="research-card">
+    <h3>Open System Dynamics of Entanglement in Dissipative Environments</h3>
+    <p>
+      Studied entanglement dynamics and decoherence in bipartite quantum systems interacting with thermal, squeezed, and vacuum environments. Developed analytical and simulation-based models for entanglement decay, robustness, and preservation. Part of an HEC-funded research project at COMSATS University Islamabad.
+    </p>
+    <div class="research-tags">
+      <span class="tag green">MSc Research · 2018–2019</span>
+      <span class="tag">HEC NRPU Grant</span>
+      <span class="tag">Quantum Optics</span>
+      <span class="tag">Open Quantum Systems</span>
+      <span class="tag">Decoherence</span>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- Publications -->
+<section id="publications">
+  <p class="section-label">Output</p>
+  <h2 class="section-title">Publications</h2>
+
+  <div class="pub-card">
+    <p class="pub-venue">EPJ D · Springer Nature · 2025</p>
+    <h3 class="pub-title">Resource Reduction for Variational Quantum Algorithms by Non-Demolition Measurements</h3>
+    <p class="pub-meta">R. Abdul Razaq, P. Solinas &nbsp;·&nbsp; arXiv:2503.24090</p>
+    <a href="https://arxiv.org/abs/2503.24090" class="pub-link" target="_blank">Read on arXiv ↗</a>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- Education & Experience -->
+<section id="education">
+  <p class="section-label">Journey</p>
+  <h2 class="section-title">Education</h2>
+
+  <div class="timeline">
+    <div class="timeline-item">
+      <div class="timeline-date">Feb 2023 — Jan 2026</div>
+      <div class="timeline-role">PhD in Physics</div>
+      <div class="timeline-place">University of Genova, Italy · INFN</div>
+      <p class="timeline-desc">
+        Thesis: Quantum Non-Demolition Measurement Techniques for Gradient Evaluation and Resource Reduction in Variational Quantum Algorithms. Supervised by Prof. Paolo Solinas.
+      </p>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-date">Sep 2017 — Sep 2019</div>
+      <div class="timeline-role">MSc in Physics</div>
+      <div class="timeline-place">COMSATS University Islamabad, Pakistan · CGPA 3.37</div>
+      <p class="timeline-desc">
+        Thesis: Entanglement Dynamics in Dissipative Environment for a Bipartite System. HEC-funded NRPU research project.
+      </p>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-date">Sep 2012 — Jul 2016</div>
+      <div class="timeline-role">BSc in Physics</div>
+      <div class="timeline-place">Government College University Faisalabad, Pakistan · CGPA 3.74</div>
+      <p class="timeline-desc">
+        Graduated with honours. Thesis on Multi-Sensor Controlled Street Lighting System Using Multi-Angle LDRs.
+      </p>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- Skills -->
+<section id="skills">
+  <p class="section-label">Expertise</p>
+  <h2 class="section-title">Technical Skills</h2>
+
+  <div class="skills-grid">
+    <div class="skill-group">
+      <div class="skill-group-title">Quantum Frameworks</div>
+      <div class="skill-item">Qiskit</div>
+      <div class="skill-item">PennyLane</div>
+      <div class="skill-item">Quantum Circuit Design</div>
+      <div class="skill-item">Quantum Simulators</div>
+      <div class="skill-item">Parameter-Shift Rule</div>
+    </div>
+    <div class="skill-group">
+      <div class="skill-group-title">Programming & Computation</div>
+      <div class="skill-item">Python</div>
+      <div class="skill-item">MATLAB</div>
+      <div class="skill-item">Wolfram Mathematica</div>
+      <div class="skill-item">High-Performance Computing</div>
+      <div class="skill-item">Numerical Modeling</div>
+    </div>
+    <div class="skill-group">
+      <div class="skill-group-title">Research Domains</div>
+      <div class="skill-item">Variational Quantum Algorithms</div>
+      <div class="skill-item">Quantum Machine Learning</div>
+      <div class="skill-item">Quantum Non-Demolition Measurements</div>
+      <div class="skill-item">Quantum Chemistry</div>
+      <div class="skill-item">Open Quantum Systems</div>
+    </div>
+    <div class="skill-group">
+      <div class="skill-group-title">Tools & Authoring</div>
+      <div class="skill-item">LaTeX / Overleaf</div>
+      <div class="skill-item">GitHub</div>
+      <div class="skill-item">Visual Studio</div>
+      <div class="skill-item">Scientific Workplace</div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- Events -->
+<section id="events">
+  <p class="section-label">Community</p>
+  <h2 class="section-title">Conferences & Events</h2>
+
+  <div class="events-list">
+    <div class="event-item">
+      <div class="event-year">Jun 2025</div>
+      <div>
+        <div class="event-name">50th International Nathiagali Summer College on Physics and Contemporary Needs</div>
+        <div class="event-location">Speaker · Quantum Technologies Session · Nathiagali, Pakistan</div>
+      </div>
+    </div>
+    <div class="event-item">
+      <div class="event-year">Sep 2024</div>
+      <div>
+        <div class="event-name">Interfacing Gravity and Quantum Physics — VCQ & TURIS Summer School</div>
+        <div class="event-location">Participant · University of Vienna, Austria · 25.5 hours</div>
+      </div>
+    </div>
+    <div class="event-item">
+      <div class="event-year">Jul 2023</div>
+      <div>
+        <div class="event-name">Frontiers and Challenges in Quantum Computing</div>
+        <div class="event-location">Seminar Participant · Italy</div>
+      </div>
+    </div>
+    <div class="event-item">
+      <div class="event-year">Apr 2019</div>
+      <div>
+        <div class="event-name">Advances in Quantum Technologies</div>
+        <div class="event-location">Symposium · National Institute of Laser and Optronics, Islamabad, Pakistan</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- Contact -->
+<section id="contact">
+  <div class="contact-grid">
+    <div class="contact-text">
+      <h2>Let's <em>connect</em>.</h2>
+      <p>
+        Open to collaborations in quantum computing research, NISQ-era algorithm development, and quantum machine learning. Currently based in Genova, Italy.
+      </p>
+      <a href="mailto:rabiarashidcui@gmail.com" class="btn btn-primary">Send an Email</a>
+    </div>
+    <div class="contact-links">
+      <a href="mailto:rabiarashidcui@gmail.com" class="contact-link">
+        <div class="contact-link-icon">✉</div>
+        <div>
+          <span class="contact-link-label">Email</span>
+          <span class="contact-link-value">rabiarashidcui@gmail.com</span>
+        </div>
+      </a>
+      <a href="mailto:rabia.abdul.razaq@edu.unige.it" class="contact-link">
+        <div class="contact-link-icon">🎓</div>
+        <div>
+          <span class="contact-link-label">Institutional</span>
+          <span class="contact-link-value">rabia.abdul.razaq@edu.unige.it</span>
+        </div>
+      </a>
+      <a href="https://github.com/rabiacui" class="contact-link" target="_blank">
+        <div class="contact-link-icon">⌥</div>
+        <div>
+          <span class="contact-link-label">GitHub</span>
+          <span class="contact-link-value">github.com/rabiacui</span>
+        </div>
+      </a>
+      <a href="https://linkedin.com/in/rabia-abdul-razaq" class="contact-link" target="_blank">
+        <div class="contact-link-icon">in</div>
+        <div>
+          <span class="contact-link-label">LinkedIn</span>
+          <span class="contact-link-value">linkedin.com/in/rabia-abdul-razaq</span>
+        </div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <p>© 2025 Rabia Abdul Razaq</p>
+  <p>PhD Candidate · University of Genova · Turin, Italy</p>
+</footer>
+
+</body>
+</html>
